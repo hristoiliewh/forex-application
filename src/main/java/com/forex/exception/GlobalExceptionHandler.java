@@ -25,6 +25,13 @@ public class GlobalExceptionHandler {
         return generateErrorDTO(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorDTO handleRest(Exception e) {
+        e.printStackTrace();
+        return generateErrorDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private ErrorDTO generateErrorDTO(Object o, HttpStatus s) {
         return ErrorDTO.builder()
                 .msg(o)

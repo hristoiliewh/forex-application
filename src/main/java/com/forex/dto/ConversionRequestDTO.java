@@ -1,6 +1,8 @@
 package com.forex.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,10 +12,11 @@ import lombok.Setter;
 @Setter
 public class ConversionRequestDTO {
 
-    @NotNull
-    private Double amount;
-    @NotNull
+    @NotNull(message = "Amount is required.")
+    @Positive(message = "Value must be a positive number.")
+    private double amount;
+    @NotBlank(message = "Source currency is required.")
     private String sourceCurrency;
-    @NotNull
+    @NotBlank(message = "Target currency is required.")
     private String targetCurrency;
 }

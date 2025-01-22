@@ -5,6 +5,7 @@ import com.forex.dto.ConversionResponseDTO;
 import com.forex.dto.ExchangeRateDTO;
 import com.forex.model.CurrencyConversion;
 import com.forex.service.ForexService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class ForexController {
     }
 
     @PostMapping("/convert")
-    public ResponseEntity<ConversionResponseDTO> convertCurrency(@RequestBody ConversionRequestDTO request) {
+    public ResponseEntity<ConversionResponseDTO> convertCurrency(@Valid @RequestBody ConversionRequestDTO request) {
         ConversionResponseDTO response = forexService.convertCurrency(request);
         return ResponseEntity.ok(response);
     }
