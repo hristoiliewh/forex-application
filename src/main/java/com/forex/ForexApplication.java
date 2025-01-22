@@ -1,4 +1,4 @@
-package com.forex.forex_application;
+package com.forex;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
