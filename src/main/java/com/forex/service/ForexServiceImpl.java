@@ -3,6 +3,8 @@ package com.forex.service;
 import com.forex.dto.ConversionRequestDTO;
 import com.forex.dto.ConversionResponseDTO;
 import com.forex.dto.ExchangeRateDTO;
+import com.forex.exception.ExternalApiException;
+import com.forex.exception.ValidationException;
 import com.forex.model.CurrencyConversion;
 import com.forex.model.ExternalRateApiResponse;
 import com.forex.repository.CurrencyConversionRepository;
@@ -31,12 +33,12 @@ public class ForexServiceImpl implements ForexService{
         ExternalRateApiResponse response = restTemplate.getForObject(url, ExternalRateApiResponse.class);
 
         if (response == null || !response.isSuccess()) {
-            throw new RuntimeException("Failed to fetch exchange rates.");
+            throw new ExternalApiException("Failed to fetch exchange rates. Please check your API key.");
         }
 
         Map<String, Double> rates = response.getRates();
         if (!rates.containsKey(sourceCurrency) || !rates.containsKey(targetCurrency)) {
-            throw new IllegalArgumentException("Invalid currency codes.");
+            throw new ValidationException("Invalid currency codes.");
         }
 
         double rate = rates.get(targetCurrency) / rates.get(sourceCurrency);
@@ -71,7 +73,7 @@ public class ForexServiceImpl implements ForexService{
         } else if (conversionDate != null) {
             return repository.findByConversionDate(conversionDate);
         } else {
-            throw new IllegalArgumentException("Either transaction id or conversion date must be provided.");
+            throw new ValidationException("Either transaction id or conversion date must be provided.");
         }
     }
 }
