@@ -19,4 +19,10 @@ public class ConversionRequestDTO {
     private String sourceCurrency;
     @NotBlank(message = "Target currency is required.")
     private String targetCurrency;
+
+    public ConversionRequestDTO(double amount, String sourceCurrency, String targetCurrency) {
+        this.amount = amount;
+        this.sourceCurrency = sourceCurrency;
+        this.targetCurrency = targetCurrency;
+    }
 }
