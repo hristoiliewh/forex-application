@@ -9,6 +9,7 @@ import com.forex.model.CurrencyConversion;
 import com.forex.model.ExternalRateApiResponse;
 import com.forex.repository.CurrencyConversionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,12 +25,14 @@ public class ForexServiceImpl implements ForexService{
     private CurrencyConversionRepository repository;
     @Autowired
     private RestTemplate restTemplate;
-    private final String fixerApiUrl = "http://data.fixer.io/api/";
-    private final String accessKey = "71927bddc17178662ea3a661ba11fbeb";
+    @Value("${fixer.api.url}")
+    private String fixerApiUrl;
+    @Value("${fixer.api.accessKey}")
+    private String accessKey;
 
     @Override
     public ExchangeRateDTO getExchangeRate(String sourceCurrency, String targetCurrency) {
-        String url = String.format("%slatest?access_key=%s", fixerApiUrl, accessKey);
+        String url = fixerApiUrl + "latest?access_key=" + accessKey;
         ExternalRateApiResponse response = restTemplate.getForObject(url, ExternalRateApiResponse.class);
 
         if (response == null || !response.isSuccess()) {
