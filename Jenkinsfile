@@ -10,6 +10,10 @@ pipeline {
         SERVER_USER = 'ec2-user'
     }
 
+    tools {
+        maven 'Maven'
+    }
+
     stages {
         stage('Checkout') {
             steps {
