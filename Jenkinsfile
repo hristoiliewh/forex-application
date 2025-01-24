@@ -13,7 +13,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/hristoiliewh/forex-application.git'
+                script {
+                    git branch: 'main', url: 'https://github.com/hristoiliewh/forex-application.git'
+                }
             }
         }
 
