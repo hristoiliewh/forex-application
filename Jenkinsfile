@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+            maven 'Maven'
+            jdk 'Java-17'
+        }
+
     environment {
         DEV_IMAGE = 'hristoiliewh/forex-application:dev-latest'
         PROD_IMAGE = 'hristoiliewh/forex-application:prod-latest'
@@ -8,10 +13,6 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'f614c061-ec5d-4d91-8445-5e190bbb03de'
         SERVER_IP = '44.200.113.124'
         SERVER_USER = 'ec2-user'
-    }
-
-    tools {
-        maven 'Maven'
     }
 
     stages {
