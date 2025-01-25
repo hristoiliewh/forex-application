@@ -25,9 +25,9 @@ public class ForexServiceImpl implements ForexService{
     private CurrencyConversionRepository repository;
     @Autowired
     private RestTemplate restTemplate;
-    @Value("${fixer.api.url}")
+    @Value("${FIXER_API_URL}")
     private String fixerApiUrl;
-    @Value("${fixer.api.accessKey}")
+    @Value("${FIXER_API_ACCESS_KEY}")
     private String accessKey;
 
     @Override
