@@ -1,7 +1,8 @@
-target/
-*.log
-*.md
+.env
 .idea/
 .vscode/
+target/
 Dockerfile
+*.log
+*.md
 *.iml
