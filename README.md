@@ -105,12 +105,8 @@ To run the application using Docker, follow these steps:
 The application will be available at `http://localhost:8080`
 
 ### 5. AWS EC2 Deployment
-The application is deployed on an AWS EC2 instance. If you want to deploy it yourself, make sure you:
-1. Set up an EC2 instance with Docker installed.
-2. Push your Docker image to a container registry (like Docker Hub).
-3. Pull and run the Docker image on the EC2 instance.
-
-The application will be available at `http://localhost:8080`
+The application is deployed on an AWS EC2 instance.
+It is available at `http://44.192.17.144:8080`
 
 ### 6. CI/CD with GitHub Actions
 This project uses GitHub Actions for continuous integration and continuous deployment. The workflow automatically builds and pushes the Docker image to Docker Hub whenever there are changes to the main branch.
