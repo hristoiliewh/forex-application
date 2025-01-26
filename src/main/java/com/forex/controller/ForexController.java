@@ -1,8 +1,8 @@
 package com.forex.controller;
 
-import com.forex.dto.ConversionRequestDTO;
-import com.forex.dto.ConversionResponseDTO;
-import com.forex.dto.ExchangeRateDTO;
+import com.forex.model.dto.ConversionRequestDTO;
+import com.forex.model.dto.ConversionResponseDTO;
+import com.forex.model.dto.ExchangeRateDTO;
 import com.forex.model.CurrencyConversion;
 import com.forex.service.ForexService;
 import jakarta.validation.Valid;

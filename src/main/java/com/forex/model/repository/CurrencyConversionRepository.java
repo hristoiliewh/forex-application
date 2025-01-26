@@ -1,4 +1,4 @@
-package com.forex.repository;
+package com.forex.model.repository;
 
 import com.forex.model.CurrencyConversion;
 import org.springframework.data.jpa.repository.JpaRepository;

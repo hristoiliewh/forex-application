@@ -1,6 +1,6 @@
-package com.forex.exception;
+package com.forex.model.exception;
 
-import com.forex.dto.ErrorDTO;
+import com.forex.model.dto.ErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;

@@ -1,12 +1,12 @@
 package com.forex.forex_application;
 
 import com.forex.config.RateLimiter;
-import com.forex.dto.ExchangeRateDTO;
-import com.forex.exception.ExternalApiException;
-import com.forex.exception.ValidationException;
+import com.forex.model.dto.ExchangeRateDTO;
+import com.forex.model.exception.ExternalApiException;
+import com.forex.model.exception.ValidationException;
 import com.forex.model.CurrencyConversion;
 import com.forex.model.ExternalRateApiResponse;
-import com.forex.repository.CurrencyConversionRepository;
+import com.forex.model.repository.CurrencyConversionRepository;
 import com.forex.service.ForexServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

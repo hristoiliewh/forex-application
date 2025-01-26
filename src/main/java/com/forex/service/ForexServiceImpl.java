@@ -1,14 +1,14 @@
 package com.forex.service;
 
 import com.forex.config.RateLimiter;
-import com.forex.dto.ConversionRequestDTO;
-import com.forex.dto.ConversionResponseDTO;
-import com.forex.dto.ExchangeRateDTO;
-import com.forex.exception.ExternalApiException;
-import com.forex.exception.ValidationException;
+import com.forex.model.dto.ConversionRequestDTO;
+import com.forex.model.dto.ConversionResponseDTO;
+import com.forex.model.dto.ExchangeRateDTO;
+import com.forex.model.exception.ExternalApiException;
+import com.forex.model.exception.ValidationException;
 import com.forex.model.CurrencyConversion;
 import com.forex.model.ExternalRateApiResponse;
-import com.forex.repository.CurrencyConversionRepository;
+import com.forex.model.repository.CurrencyConversionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

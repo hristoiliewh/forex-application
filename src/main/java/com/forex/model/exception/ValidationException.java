@@ -1,4 +1,4 @@
-package com.forex.exception;
+package com.forex.model.exception;
 
 public class ValidationException extends RuntimeException {
     public ValidationException(String message) {

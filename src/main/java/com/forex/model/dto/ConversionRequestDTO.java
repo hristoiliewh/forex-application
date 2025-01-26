@@ -1,4 +1,4 @@
-package com.forex.dto;
+package com.forex.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package com.forex.dto;
+package com.forex.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;
