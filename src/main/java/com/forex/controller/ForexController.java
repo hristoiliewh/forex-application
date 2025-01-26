@@ -7,10 +7,6 @@ import com.forex.model.CurrencyConversion;
 import com.forex.service.ForexService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -27,8 +23,6 @@ public class ForexController {
 
     @Autowired
     private ForexService forexService;
-
-
 
     @Operation(summary = "Get exchange rate between two currencies", description = "Retrieve the exchange rate between source and target currencies.")
     @GetMapping("/rate")
