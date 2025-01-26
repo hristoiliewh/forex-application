@@ -1,4 +1,5 @@
-FROM maven:3-openjdk-17 AS build
+FROM openjdk:17-jdk-slim AS build
+RUN apt-get update && apt-get install -y maven
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
