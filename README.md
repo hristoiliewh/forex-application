@@ -81,6 +81,7 @@ Retrieve conversion history.
   }
 ]
 ```
+---
 ## Setup and Installation
 ### 1. Clone the Repository
 `git clone https://github.com/hristoiliewh/forex-application`
@@ -110,6 +111,13 @@ The application is deployed on an AWS EC2 instance. If you want to deploy it you
 3. Pull and run the Docker image on the EC2 instance.
 
 The application will be available at `http://localhost:8080`
+
+### 6. CI/CD with GitHub Actions
+This project uses GitHub Actions for continuous integration and continuous deployment. The workflow automatically builds and pushes the Docker image to Docker Hub whenever there are changes to the main branch.
+
+Workflow Overview:
+- **Build and Push Docker Images**: The workflow is triggered on every push to the main branch. It builds the Docker image from the codebase and pushes it to Docker Hub under the hristoiliewh/forex-application:latest tag.
+
 
 ## API Documentation
 The API documentation is generated using Springdoc OpenAPI and can be accessed at:
