@@ -1,10 +1,7 @@
 package com.forex.model.exception;
 
 import com.forex.model.dto.ErrorDTO;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,7 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExternalApiException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ApiResponse(responseCode = "401", description = "Unauthorized access, external API error")
+    @ApiResponse(responseCode = "401", description = "Rates are temporarily unavailable. Please try again later.")
     public ErrorDTO handleExternalApiException(Exception e) {
         e.printStackTrace();
         return generateErrorDTO(e.getMessage(), HttpStatus.UNAUTHORIZED);
