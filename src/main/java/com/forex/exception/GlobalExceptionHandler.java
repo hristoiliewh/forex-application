@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
 
         e.getBindingResult().getFieldErrors().forEach(error -> {
             String errorMessage = error.getDefaultMessage();
-            errorMessages.add(errorMessage); // Add only the error message
+            errorMessages.add(errorMessage);
         });
 
         return generateErrorDTO(errorMessages, HttpStatus.BAD_REQUEST);
