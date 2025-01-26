@@ -10,6 +10,7 @@ import com.forex.model.ExternalRateApiResponse;
 import com.forex.repository.CurrencyConversionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,6 +32,7 @@ public class ForexServiceImpl implements ForexService{
     private String fixerApiAccessKey;
 
     @Override
+    @Cacheable(value = "exchangeRates", key = "#sourceCurrency + '_' + #targetCurrency", unless = "#result == null")
     public ExchangeRateDTO getExchangeRate(String sourceCurrency, String targetCurrency) {
         String url = fixerApiUrl + "latest?access_key=" + fixerApiAccessKey;
         ExternalRateApiResponse response = restTemplate.getForObject(url, ExternalRateApiResponse.class);
