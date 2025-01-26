@@ -1,6 +1,10 @@
 package com.forex.model.exception;
 
 import com.forex.model.dto.ErrorDTO;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,13 +25,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExternalApiException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ApiResponse(responseCode = "401", description = "Unauthorized access, external API error")
     public ErrorDTO handleExternalApiException(Exception e) {
         e.printStackTrace();
         return generateErrorDTO(e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(ValidationException.class) // Add handler for ValidationException
+    @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ApiResponse(responseCode = "400", description = "Bad request, validation failed")
     public ErrorDTO handleValidationException(ValidationException e) {
         e.printStackTrace();
         return generateErrorDTO(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -35,6 +41,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ApiResponse(responseCode = "400", description = "Missing required request parameter")
     public ErrorDTO handleMissingRequestParam(MissingServletRequestParameterException e) {
         String errorMessage = String.format("Missing required request parameter: %s", e.getParameterName());
         return generateErrorDTO(errorMessage, HttpStatus.BAD_REQUEST);
@@ -42,6 +49,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ApiResponse(responseCode = "400", description = "Validation failed for request body")
     public ErrorDTO handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         List<String> errorMessages = new ArrayList<>();
 
@@ -75,6 +83,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
     public ErrorDTO handleRest(Exception e) {
         e.printStackTrace();
         return generateErrorDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

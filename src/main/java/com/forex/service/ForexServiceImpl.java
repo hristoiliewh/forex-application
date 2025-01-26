@@ -50,7 +50,7 @@ public class ForexServiceImpl implements ForexService{
                 return cachedRate;
             }
             log.warn("RATE LIMITED - No cached rate available. Returning fallback rate for {} to {}", sourceCurrency, targetCurrency);
-            return new ExchangeRateDTO(sourceCurrency, targetCurrency, 0.0);
+            return new ExchangeRateDTO(sourceCurrency, targetCurrency, -1.0);
         }
 
         try {
@@ -66,7 +66,6 @@ public class ForexServiceImpl implements ForexService{
             return new ExchangeRateDTO(sourceCurrency, targetCurrency, rate);
         } catch (Exception e){
             log.error("EXTERNAL API ERROR: {}", e.getMessage(), e);
-
             ExchangeRateDTO cachedRate = getCachedExchangeRate(sourceCurrency, targetCurrency);
             if (cachedRate != null) {
                 log.info("Returning cached rate for {} to {} after API error", sourceCurrency, targetCurrency);
