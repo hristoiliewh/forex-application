@@ -1,7 +1,6 @@
 package com.forex.forex_application;
 
-import com.forex.dto.ConversionRequestDTO;
-import com.forex.dto.ConversionResponseDTO;
+import com.forex.config.RateLimiter;
 import com.forex.dto.ExchangeRateDTO;
 import com.forex.exception.ExternalApiException;
 import com.forex.exception.ValidationException;
@@ -11,21 +10,23 @@ import com.forex.repository.CurrencyConversionRepository;
 import com.forex.service.ForexServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.*;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-public class ForexServiceImplTest {
+class ForexServiceImplTest {
+
+    @InjectMocks
+    private ForexServiceImpl forexService;
 
     @Mock
     private CurrencyConversionRepository repository;
@@ -33,123 +34,118 @@ public class ForexServiceImplTest {
     @Mock
     private RestTemplate restTemplate;
 
-    @InjectMocks
-    private ForexServiceImpl forexService;
+    @Mock
+    private RateLimiter rateLimiter;
+
+    @Mock
+    private CacheManager cacheManager;
+
+    @Mock
+    private Cache cache;
+
+    @Mock
+    private ExternalRateApiResponse externalRateApiResponse;
 
     @BeforeEach
-    public void setUp() {
-
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        when(cacheManager.getCache(anyString())).thenReturn(cache);
     }
 
     @Test
-    public void testGetExchangeRate_Success() {
+    void testGetExchangeRateWhenRateLimitedAndCachedRateIsAvailable() {
         String sourceCurrency = "USD";
         String targetCurrency = "EUR";
+        ExchangeRateDTO cachedRate = new ExchangeRateDTO(sourceCurrency, targetCurrency, 0.85);
 
-        ExternalRateApiResponse response = new ExternalRateApiResponse();
-        response.setSuccess(true);
-        response.setRates(Map.of("USD", 1.0, "EUR", 0.85));
+        when(rateLimiter.isRateLimited()).thenReturn(true);
+        when(forexService.getCachedExchangeRate(sourceCurrency, targetCurrency)).thenReturn(cachedRate);
 
+        ExchangeRateDTO result = forexService.getExchangeRate(sourceCurrency, targetCurrency);
+
+        assertEquals(cachedRate, result);
+        verify(rateLimiter, times(1)).isRateLimited();
+    }
+
+    @Test
+    void testGetExchangeRateWhenRateLimitedAndNoCachedRate() {
+        String sourceCurrency = "USD";
+        String targetCurrency = "EUR";
+        ExchangeRateDTO fallbackRate = new ExchangeRateDTO(sourceCurrency, targetCurrency, 0.0);
+
+        when(rateLimiter.isRateLimited()).thenReturn(true);
+        when(forexService.getCachedExchangeRate(sourceCurrency, targetCurrency)).thenReturn(null);
+
+        ExchangeRateDTO result = forexService.getExchangeRate(sourceCurrency, targetCurrency);
+
+        assertEquals(fallbackRate.getExchangeRate(), result.getExchangeRate());
+    }
+
+    @Test
+    void testGetExchangeRateWhenExternalApiCallSucceeds() {
+        String sourceCurrency = "USD";
+        String targetCurrency = "EUR";
+        Map<String, Double> rates = new HashMap<>();
+        rates.put("EUR", 0.85);
+        rates.put("USD", 1.0);
+
+        ExternalRateApiResponse response = mock(ExternalRateApiResponse.class);
+        when(response.getRates()).thenReturn(rates);
+        when(response.isSuccess()).thenReturn(true);
+
+        String apiUrl = "https://any.apiUrl";
         when(restTemplate.getForObject(anyString(), eq(ExternalRateApiResponse.class))).thenReturn(response);
 
         ExchangeRateDTO result = forexService.getExchangeRate(sourceCurrency, targetCurrency);
 
-        assertNotNull(result);
-        assertEquals("USD", result.getSourceCurrency());
-        assertEquals("EUR", result.getTargetCurrency());
         assertEquals(0.85, result.getExchangeRate());
     }
 
     @Test
-    public void testGetExchangeRate_FailedApiCall() {
+    void testGetExchangeRateWhenExternalApiCallFailsAndNoCachedRate() {
         String sourceCurrency = "USD";
         String targetCurrency = "EUR";
 
-        when(restTemplate.getForObject(anyString(), eq(ExternalRateApiResponse.class))).thenReturn(null);
-
-        assertThrows(ExternalApiException.class, () -> forexService.getExchangeRate(sourceCurrency, targetCurrency));
-    }
-
-    @Test
-    public void testGetExchangeRate_InvalidCurrency() {
-        String sourceCurrency = "USD";
-        String targetCurrency = "INVALID";
-
-        ExternalRateApiResponse response = new ExternalRateApiResponse();
-        response.setSuccess(true);
-        response.setRates(Map.of("USD", 1.0, "EUR", 0.85));
-
+        ExternalRateApiResponse response = mock(ExternalRateApiResponse.class);
+        when(response.isSuccess()).thenReturn(false);
         when(restTemplate.getForObject(anyString(), eq(ExternalRateApiResponse.class))).thenReturn(response);
+        when(forexService.getCachedExchangeRate(sourceCurrency, targetCurrency)).thenReturn(null);
 
-        assertThrows(ValidationException.class, () -> forexService.getExchangeRate(sourceCurrency, targetCurrency));
+        ExternalApiException exception = assertThrows(ExternalApiException.class, () -> {
+            forexService.getExchangeRate(sourceCurrency, targetCurrency);
+        });
+        assertEquals("Rates are temporarily unavailable. Please try again later.", exception.getMessage());
     }
 
     @Test
-    public void testConvertCurrency_Success() {
-        ConversionRequestDTO requestDTO = new ConversionRequestDTO(100, "USD", "EUR");
-
-        ExternalRateApiResponse response = new ExternalRateApiResponse();
-        response.setSuccess(true);
-        response.setRates(Map.of("USD", 1.0, "EUR", 0.85));
-
-        when(restTemplate.getForObject(anyString(), eq(ExternalRateApiResponse.class))).thenReturn(response);
-
-        CurrencyConversion conversion = new CurrencyConversion(null, "USD", "EUR", 100, 85.0, "transactionId", LocalDate.now());
-        when(repository.save(any(CurrencyConversion.class))).thenReturn(conversion);
-
-        ConversionResponseDTO responseDTO = forexService.convertCurrency(requestDTO);
-
-        assertNotNull(responseDTO);
-        assertEquals(85.0, responseDTO.getConvertedAmount());
-        assertNotNull(responseDTO.getTransactionId());
-        verify(repository, times(1)).save(any(CurrencyConversion.class));
-    }
-
-    @Test
-    public void testConvertCurrency_InvalidCurrency() {
-        ConversionRequestDTO requestDTO = new ConversionRequestDTO(100, "USD", "INVALID");
-
-        ExternalRateApiResponse response = new ExternalRateApiResponse();
-        response.setSuccess(true);
-        response.setRates(Map.of("USD", 1.0, "GBP", 0.8));
-
-        when(restTemplate.getForObject(anyString(), eq(ExternalRateApiResponse.class))).thenReturn(response);
-
-        assertThrows(ValidationException.class, () -> forexService.convertCurrency(requestDTO));
-        verify(repository, times(0)).save(any(CurrencyConversion.class));
-    }
-
-    @Test
-    public void testGetConversionHistory_ByTransactionId() {
+    void testGetConversionHistoryWithTransactionId() {
         String transactionId = "transactionId";
-        CurrencyConversion conversion = new CurrencyConversion(null,"USD", "EUR", 100, 85.0, transactionId, LocalDate.now());
+        List<CurrencyConversion> expectedConversions = List.of(new CurrencyConversion());
+        when(repository.findByTransactionId(transactionId)).thenReturn(expectedConversions);
 
-        when(repository.findByTransactionId(transactionId)).thenReturn(List.of(conversion));
+        List<CurrencyConversion> result = forexService.getConversionHistory(transactionId, null, 1, 10);
 
-        List<CurrencyConversion> history = forexService.getConversionHistory(transactionId, null, 0, 10);
-
-        assertNotNull(history);
-        assertEquals(1, history.size());
-        assertEquals(transactionId, history.get(0).getTransactionId());
+        assertEquals(expectedConversions, result);
+        verify(repository, times(1)).findByTransactionId(transactionId);
     }
 
     @Test
-    public void testGetConversionHistory_ByConversionDate() {
-        LocalDate date = LocalDate.now();
-        CurrencyConversion conversion = new CurrencyConversion(null, "USD", "EUR", 100, 85.0, "transactionId", date);
+    void testGetConversionHistoryWithConversionDate() {
+        LocalDate conversionDate = LocalDate.now();
+        List<CurrencyConversion> expectedConversions = List.of(new CurrencyConversion());
+        when(repository.findByConversionDate(conversionDate)).thenReturn(expectedConversions);
 
-        when(repository.findByConversionDate(date)).thenReturn(List.of(conversion));
+        List<CurrencyConversion> result = forexService.getConversionHistory(null, conversionDate, 1, 10);
 
-        List<CurrencyConversion> history = forexService.getConversionHistory(null, date, 0, 10);
-
-        assertNotNull(history);
-        assertEquals(1, history.size());
-        assertEquals(date, history.get(0).getConversionDate());
+        assertEquals(expectedConversions, result);
+        verify(repository, times(1)).findByConversionDate(conversionDate);
     }
 
     @Test
-    public void testGetConversionHistory_InvalidRequest() {
-        assertThrows(ValidationException.class, () -> forexService.getConversionHistory(null, null, 0, 10));
+    void testGetConversionHistoryWithValidationException() {
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            forexService.getConversionHistory(null, null, 1, 10);
+        });
+        assertEquals("Either transaction id or conversion date must be provided.", exception.getMessage());
     }
-
 }

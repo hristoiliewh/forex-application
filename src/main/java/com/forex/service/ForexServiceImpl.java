@@ -77,8 +77,6 @@ public class ForexServiceImpl implements ForexService{
         }
     }
 
-
-
     @Override
     public ConversionResponseDTO convertCurrency(ConversionRequestDTO request) {
         ExchangeRateDTO rateDTO = getExchangeRate(request.getSourceCurrency(), request.getTargetCurrency());
