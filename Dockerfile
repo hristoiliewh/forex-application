@@ -4,6 +4,7 @@ COPY pom.xml .
 RUN mvn dependency:go-offline
 COPY . .
 RUN mvn clean install -DskipTests
+
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=build /app/target/forex-application-0.0.1-SNAPSHOT.jar forex-application.jar

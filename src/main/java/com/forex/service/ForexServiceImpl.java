@@ -25,14 +25,14 @@ public class ForexServiceImpl implements ForexService{
     private CurrencyConversionRepository repository;
     @Autowired
     private RestTemplate restTemplate;
-    @Value("${FIXER_API_URL}")
+    @Value("${fixer.api.url}")
     private String fixerApiUrl;
-    @Value("${FIXER_API_ACCESS_KEY}")
-    private String accessKey;
+    @Value("${fixer.api.access-key}")
+    private String fixerApiAccessKey;
 
     @Override
     public ExchangeRateDTO getExchangeRate(String sourceCurrency, String targetCurrency) {
-        String url = fixerApiUrl + "latest?access_key=" + accessKey;
+        String url = fixerApiUrl + "latest?access_key=" + fixerApiAccessKey;
         ExternalRateApiResponse response = restTemplate.getForObject(url, ExternalRateApiResponse.class);
 
         if (response == null || !response.isSuccess()) {

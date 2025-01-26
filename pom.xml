@@ -77,7 +77,6 @@
 			<version>5.11.4</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>

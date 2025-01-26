@@ -1,7 +1,8 @@
 services:
   forex-application:
     image: forex-application:latest
-    env_file:
-      - .env
     ports:
       - "8080:8080"
+    environment:
+      - FIXER_API_ACCESS_KEY=${FIXER_API_ACCESS_KEY}
+      - FIXER_API_URL=${FIXER_API_URL}

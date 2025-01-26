@@ -1,5 +1,4 @@
 # Ignore sensitive or build-related files
-.env
 .idea/
 .vscode/
 target/
